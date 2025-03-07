@@ -8,9 +8,10 @@ import {
   ActivityIndicator
 } from "react-native";
 import { styled } from "nativewind";
-import ForgotPasswordModal from "./ForgotPasswordModal";
+import ForgotPasswordEmailModal from "./ForgotPasswordEmailModal"; // ✅ Updated Import
 import { IP_ADDR } from "@env";
 import { Eye, EyeOff } from "lucide-react-native"; // 👀 Import password toggle icons
+import { theme } from "../assets/theme";
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -25,6 +26,7 @@ const EmailLogin = () => {
   const [showErrors, setShowErrors] = useState(false);
   const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);  
 
   // ✅ Validate user input
   const validateInput = () => {
@@ -62,7 +64,7 @@ const EmailLogin = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${IP_ADDR}/api/auth/login`, {
+      const response = await fetch(`http://13.201.98.12:4000/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -84,41 +86,16 @@ const EmailLogin = () => {
 
   // ✅ Handle forgot password request
   const handleForgotPassword = async () => {
-    if (!credentials.email.trim()) {
-      Alert.alert("Error", "Please enter your email before resetting the password.");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(credentials.email)) {
-      Alert.alert("Error", "Invalid email format.");
-      return;
-    }
-
-    try {
-      const response = await fetch(`${IP_ADDR}/api/auth/forgotpassword`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: credentials.email }),
-      });
-
-      const data = await response.json();
-
-      if (data.message !== "Email not registered") {
         setForgotPasswordVisible(true);
-      } else {
-        Alert.alert("Error", data.message || "Something went wrong. Please try again.");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Something went wrong. Please try again later.");
-    }
   };
 
   return (
     <StyledView>
       {/* Email Input */}
       <StyledTextInput
-        className="p-4 mb-2 text-base text-gray-800 placeholder-[#b3b3b3] border border-gray-300 rounded-xl"
+        className={`p-4 mb-1 mt-2 text-base ${theme.colors.black} border ${
+          isEmailFocused ? "border-[#0088b1]" : "border-gray-300"
+        } rounded-xl`}
         placeholder="mediversal@gmail.com"
         value={credentials.email}
         onChangeText={(text) => setCredentials({ ...credentials, email: text })}
@@ -127,6 +104,8 @@ const EmailLogin = () => {
         autoComplete="email"
         returnKeyType="done"
         placeholderTextColor="#b3b3b3"
+        onFocus={() => setIsEmailFocused(true)}
+        onBlur={() => setIsEmailFocused(false)}
       />
       {showErrors && errors.email && (
         <StyledText className="mb-2 text-red-500">{errors.email}</StyledText>
@@ -135,30 +114,32 @@ const EmailLogin = () => {
       {/* Password Input with Toggle Visibility */}
       <StyledView className="relative">
         <StyledTextInput
-          className={`p-4 pr-12 mt-4 text-base text-gray-500 border border-gray-300 rounded-xl`}
-          placeholder="********"
+          className="p-4 pr-12 mt-4 text-base text-gray-500 border border-gray-300 rounded-xl"
+          placeholder="*********"
           value={credentials.password}
           onChangeText={(text) => setCredentials({ ...credentials, password: text })}
-          secureTextEntry={!isPasswordVisible}
+          secureTextEntry={!isPasswordVisible} // ✅ Ensures it updates correctly
           returnKeyType="done"
-          blurOnSubmit
           placeholderTextColor="#b3b3b3"
         />
+        
+        {/* ✅ Make the eye icon more clickable */}
         <StyledTouchableOpacity
-          className="absolute right-4 top-8"
-          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          className="absolute p-3 rounded-full right-2 top-5"
+          onPress={() => setIsPasswordVisible((prevState) => !prevState)}
         >
-          {isPasswordVisible ? <EyeOff size={20} color="#0088b1" /> : <Eye size={20} color="#0088b1" />}
+          {isPasswordVisible ? <EyeOff size={24} color="#0088b1" /> : <Eye size={24} color="#0088b1" />}
         </StyledTouchableOpacity>
       </StyledView>
+
       {showErrors && errors.password && (
         <StyledText className="mt-2 text-red-500">{errors.password}</StyledText>
       )}
 
       {/* Forgot Password Link */}
-      <StyledView className="flex flex-row justify-end w-full pt-4 pb-4">
-        <StyledTouchableOpacity onPress={handleForgotPassword} className="mt-3">
-          <StyledText className="text-[#0088B1] text-base font-xl font-medium">
+      <StyledView className="flex flex-row justify-end w-full py-8">
+        <StyledTouchableOpacity onPress={handleForgotPassword} className="">
+          <StyledText className="text-[#0088B1] text-base font-xl font-regular">
             Forgot Password?
           </StyledText>
         </StyledTouchableOpacity>
@@ -166,25 +147,24 @@ const EmailLogin = () => {
 
       {/* Login Button */}
       <StyledTouchableOpacity
-        className="p-4 mt-5 rounded-xl items-center bg-[#0088B1]"
+        className="p-4  rounded-xl items-center bg-[#0088B1]"
         onPress={handleLogin}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
-          <StyledText className="text-lg font-medium text-white">Login</StyledText>
+          <StyledText className={`text-base font-medium ${theme.colors.white}`}>Login</StyledText>
         )}
       </StyledTouchableOpacity>
-      
 
-      {/* Forgot Password Modal */}
+      {/* Forgot Password Email Modal */}
       {forgotPasswordVisible && (
-        <ForgotPasswordModal
-          isVisible={forgotPasswordVisible}
-          onClose={() => setForgotPasswordVisible(false)}
-          email={credentials.email}
-        />
+        <ForgotPasswordEmailModal
+        isVisible={forgotPasswordVisible}
+        onClose={() => setForgotPasswordVisible(false)}
+        email={credentials.email}
+      />      
       )}
     </StyledView>
   );

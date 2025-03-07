@@ -4,6 +4,7 @@ import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-si
 import { styled } from "nativewind";
 import { theme } from "../assets/theme";
 import { IP_ADDR } from "@env"; // ✅ Load API URL from .env
+import GoogleIcon from "../assets/photos/googleIcon.svg";
 
 // ✅ Styled Components
 const StyledTouchableOpacity = styled(TouchableOpacity);
@@ -13,7 +14,7 @@ const StyledView = styled(View);
 
 // ✅ Google Sign-In Configuration
 GoogleSignin.configure({
-  scopes: ["profile","email"],
+  scopes: ["profile", "email"],
   webClientId: "46248115272-m66gnu362gmi9uflfojcm53a3ihulq90.apps.googleusercontent.com",
 });
 
@@ -22,24 +23,33 @@ const GoogleLoginButton = () => {
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signOut();
-  
-      const signInData = await GoogleSignin.signIn();
-      const idToken = signInData?.data?.idToken;
 
+      const signInData = await GoogleSignin.signIn();
+      const idToken = signInData?.data?.idToken; // ✅ Extract only idToken
       console.log(idToken);
-      // Display full sign-in data
-      Alert.alert("Google Sign-In Success", JSON.stringify(idToken, null, 2));
+
+      if (!idToken) {
+        Alert.alert("Error", "Failed to retrieve Google ID Token.");
+        return;
+      }
+
+      // ✅ Send idToken to API
+      const response = await fetch(`http://13.201.98.12:4000/api/auth/google`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.user && data.jwt) {
+        Alert.alert("Success", "Google login successful!");
+      } else {
+        Alert.alert("Login Failed", data.error || "An error occurred.");
+      }
     } catch (error: any) {
-      // Display full error details
-      Alert.alert("Google Sign-In Error", JSON.stringify(error, null, 2));
-  
-      // Extract error message and code safely
-      const errorMessage = typeof error === "object" && error?.message
-        ? String(error.message) 
-        : "Unknown error occurred";
-  
-      const errorCode = error?.code ? `Error Code: ${error.code}` : "";
-  
+      // ✅ Handle Sign-in Errors
+      const errorMessage = error?.message || "Unknown error occurred";
       switch (error.code) {
         case statusCodes.SIGN_IN_CANCELLED:
           Alert.alert("Cancelled", "Google Sign-In was cancelled.");
@@ -51,23 +61,19 @@ const GoogleLoginButton = () => {
           Alert.alert("Error", "Google Play Services is not available.");
           break;
         default:
-          Alert.alert("Error", `${errorMessage}\n${errorCode}`);
+          Alert.alert("Error", errorMessage);
       }
     }
-  };  
+  };
 
   return (
     <StyledTouchableOpacity
-      className={`flex-row items-center justify-center p-4  bg-[#E8F4F7] rounded-xl border-2 border-[#0088b1]`}
+      className="flex-row items-center justify-center px-4 py-3 bg-[#E8F4F7] rounded-xl border-[1px] border-[#0088b1]"
       onPress={handleGoogleLogin}
     >
-      <StyledImage
-        source={require("../assets/photos/google.png")}
-        className="w-6 h-6 "
-        resizeMode="contain"
-      />
+      <GoogleIcon width={24} height={24} /> 
       <StyledView className="w-[1px] h-6 bg-gray-400 mx-4" />
-      <StyledText className={`text-lg font-bold ${theme.colors.black}`}>Login with Google</StyledText>
+      <StyledText className={`text-base font-medium ${theme.colors.black}`}>Login with Google</StyledText>
     </StyledTouchableOpacity>
   );
 };

@@ -36,65 +36,57 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isVisible, timer]); 
-  
+  }, [isVisible, timer]);
 
   const handleOTPChange = (value: string, index: number) => {
     if (!/^[0-9]?$/.test(value)) return;
-  
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-  
-    setTimeout(() => {
-      if (value && index < 5) {
-        // Move to next input if a digit is entered
-        inputRefs.current[index + 1]?.focus();
-      } else if (!value && index > 0) {
-        // Move back if a digit is removed
-        inputRefs.current[index - 1]?.focus();
-      }
-    }, 0);
-  };
-  
-  
 
-  // ✅ Verify OTP API Call
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    } else if (!value && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
   const handleVerifyOTP = async () => {
-    const enteredOTP = otp.join(""); // Convert array to string
-  
+    const enteredOTP = otp.join("");
+
     if (enteredOTP.length !== 6) {
       Alert.alert("Invalid OTP", "Please enter all 6 digits.");
       return;
     }
-  
+
     try {
-      const response = await axios.post(`${IP_ADDR}/api/auth/verifyotp`, {
+      const response = await axios.post(`http://13.201.98.12:4000/api/auth/verifyotp`, {
         phone: phoneNumber,
         otp: enteredOTP,
         auth_method: "phone",
       });
 
-      const { jwt, message } = response.data; 
+      const { jwt, message } = response.data;
 
       if (jwt) {
         Alert.alert("OTP Verified", "Next part is under development.");
-        return;
       } else {
         Alert.alert("Error", message || "Invalid OTP. Try again.");
       }
     } catch (error) {
       Alert.alert("Error", "Failed to verify OTP. Please try again.");
     }
-}; 
+  };
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post(`${IP_ADDR}/api/auth/register`, {
-        phone: phoneNumber, auth_method:"phone"
+      const response = await axios.post(`http://13.201.98.12:4000/api/auth/register`, {
+        phone: phoneNumber,
+        auth_method: "phone",
       });
-      if (response.data.message == "SMS sent successfully") {
-        setTimer(60); 
+      if (response.data.message === "SMS sent successfully") {
+        setTimer(60);
       } else {
         Alert.alert("Error", response.data.message || "Failed to resend OTP.");
       }
@@ -103,12 +95,20 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
     }
   };
 
+  const isOtpFilled = otp.every((digit) => digit !== "");
+
   return (
     <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
-      <StyledView className="items-center p-5 bg-white rounded-t-3xl">
-        <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>6-Digit Code</StyledText>
-        <StyledText className={`mb-3 ${theme.colors.gray}`}>Code sent for verification</StyledText>
-        <StyledText className={`mb-3 ${theme.colors.gray}`}>Please enter the code below</StyledText>
+      <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-3xl">
+        <StyledView className="self-start pl-3">
+          <StyledText className={`mb-3 text-3xl font-bold ${theme.colors.primary}`}>
+            6-Digit OTP
+          </StyledText>
+          <StyledText className={`mb-3 text-base pb-4 ${theme.colors.gray}`}>
+            OTP sent to {phoneNumber} for verification.
+            Please enter the code here.
+          </StyledText>
+        </StyledView>
 
         {/* ✅ OTP Input Row */}
         <StyledView className="flex-row justify-center space-x-3">
@@ -118,7 +118,9 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
               ref={(el) => {
                 inputRefs.current[index] = el as TextInput | null;
               }}
-              className={`w-12 h-12 text-lg font-bold text-center border border-gray-400 rounded-lg focus:${theme.colors.primary}`}
+              className={`w-12 h-12 text-lg font-bold text-center border ${
+                digit ? "border-[#0088B1]" : "border-gray-300"
+              } rounded-lg`}
               keyboardType="numeric"
               maxLength={1}
               value={digit}
@@ -127,24 +129,34 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
           ))}
         </StyledView>
 
-        <StyledView className="flex-row items-center mt-1 mb-3">
-          {/* ⏳ Timer */}
-          <StyledText className={`mr-3 font-bold ${theme.colors.primary}`}>{timer}s</StyledText>
-
-          {/* ✅ Resend OTP Button */}
-          {timer === 0 && (
-            <StyledTouchableOpacity onPress={(handleResendOTP)}>
-              <StyledText className={`font-bold ${theme.colors.gray}`}>Resend OTP</StyledText>
+        {/* ✅ Timer & Resend OTP */}
+        <StyledView className="flex-row items-center justify-center w-full px-5 mt-3 mb-3">
+          {timer > 0 ? (
+            <StyledText className="font-bold text-center">
+              <StyledText className={`${theme.colors.gray}`}>Didn't get OTP? Resend in </StyledText>
+              <StyledText className={`${theme.colors.primary}`}>{timer}s</StyledText>
+            </StyledText>
+          ) : (
+            <StyledTouchableOpacity onPress={handleResendOTP}>
+              <StyledText className={`font-bold text-center ${theme.colors.primary}`}>
+                Resend OTP
+              </StyledText>
             </StyledTouchableOpacity>
           )}
         </StyledView>
 
+
         {/* ✅ Verify OTP Button */}
         <StyledTouchableOpacity
-          className="bg-[#0088B1] p-3 rounded-xl mt-5 w-full items-center"
-          onPress={handleVerifyOTP}
+          className={`p-3 rounded-xl mt-5 w-full items-center ${
+            isOtpFilled ? "bg-[#0088B1]" : "border border-[#0088B1] bg-transparent"
+          }`}
+          onPress={isOtpFilled ? handleVerifyOTP : () => {}}
+          disabled={!isOtpFilled}
         >
-          <StyledText className="text-lg font-bold text-white">Verify OTP</StyledText>
+          <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
+            Verify OTP
+          </StyledText>
         </StyledTouchableOpacity>
       </StyledView>
     </Modal>

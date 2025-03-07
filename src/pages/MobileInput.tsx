@@ -4,6 +4,7 @@ import { styled } from "nativewind";
 import CountryPickerComponent from "./CountryPicker";
 import OTPModalMobile from "./OTPModalMobile"; 
 import { IP_ADDR } from "@env";
+import { theme } from "../assets/theme";
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -18,6 +19,7 @@ const MobileInput = () => {
   });
   const [isOTPModalVisible, setOTPModalVisible] = useState(false);
   const [loading, setLoading] = useState(false); 
+  const [isMobileFocused, setIsMobileFocused] = useState(false);
 
   // ✅ Handle input change with validation
   const handleMobileInputChange = (text) => {
@@ -45,7 +47,7 @@ const MobileInput = () => {
   
     try {
       const response = (await Promise.race([
-        fetch(`${IP_ADDR}/api/auth/register`, {
+        fetch(`http://13.201.98.12:4000/api/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: mobileNumber, auth_method:"phone"}),
@@ -65,6 +67,7 @@ const MobileInput = () => {
       setOTPModalVisible(true);
   
     } catch (error) {
+      
       setLoading(false);
       clearTimeout(timeoutId);
       
@@ -81,37 +84,43 @@ const MobileInput = () => {
 
 
   return (
-    <StyledView className="flex-col items-center w-full p-2">
+    <StyledView className="flex-col items-center w-full mt-2">
       <StyledView className="flex-row items-center w-full space-x-3">
         {/* ✅ Country Code Box */}
-        <StyledView className="p-3 bg-white border border-gray-300 rounded-xl">
+        <StyledView className="p-3 bg-[#f8f8f8] border border-gray-300 rounded-xl">
           <CountryPickerComponent onSelectCountry={setSelectedCountry} />
         </StyledView>
 
         {/* ✅ Mobile Number Input Box */}
-        <StyledView className="flex-auto p-1 bg-white border border-gray-300 rounded-xl min-h-[50px]">
+        <StyledView
+        className={`flex-auto p-1 bg-[#f8f8f8] border ${
+          isMobileFocused ? "border-[#0088b1]" : "border-gray-300"
+        } rounded-xl min-h-[50px]`}
+      >
         <StyledTextInput
-          className="w-full text-base placeholder-[#b3b3b3] font-regular pl-3"
+          className={`w-full text-base placeholder-[#b3b3b3] font-regular pl-3 ${theme.colors.black}`}
           placeholder="98765-43210"
           keyboardType="numeric"
           value={mobileNumber}
           onChangeText={handleMobileInputChange}
           maxLength={10}
-          placeholderTextColor="gray"
+          placeholderTextColor="#b3b3b3"
+          onFocus={() => setIsMobileFocused(true)}
+          onBlur={() => setIsMobileFocused(false)}
         />
-        </StyledView>
+      </StyledView>
       </StyledView>
 
       {/* ✅ OTP Button */}
       <StyledTouchableOpacity
-        className="bg-[#0088B1] p-4 rounded-xl items-center mt-5 w-full "
+        className="bg-[#0088B1] p-4 rounded-xl items-center mt-6 w-full "
         onPress={sendOTP} 
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <StyledText className="text-lg font-medium text-center text-white">
+          <StyledText className={`text-lg font-medium text-center ${theme.colors.white}`}>
             Send the OTP
           </StyledText>
         )}

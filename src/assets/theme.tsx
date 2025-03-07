@@ -26,7 +26,7 @@ export const theme: Theme = {
     primary: "text-[#0088B1]",
     secondary: "text-[#F8F8F8]",
     tertiary: "text-[#E8F4F7]",
-    white: "text-white",
+    white: "text-[#F8F8F8]",
     black: "text-[#161d1f]",
     gray: "text-gray-400",
   },

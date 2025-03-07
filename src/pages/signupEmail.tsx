@@ -4,6 +4,9 @@ import { styled } from "nativewind";
 import OTPModalEmail from "./OTPModalEmail";
 import { Eye, EyeOff } from "lucide-react-native";
 import { IP_ADDR } from "@env";
+import { theme } from "../assets/theme";
+import LoginScreen from "./loginMobile"; // ✅ Import LoginScreen
+import { useNavigation } from "@react-navigation/native"; // ✅ Import navigation hook
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -19,6 +22,10 @@ const EmailSignup = () => {
   const [loading, setLoading] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+  
 
   // ✅ Email validation regex
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -65,7 +72,7 @@ const EmailSignup = () => {
     setLoading(true);
   
     try {
-      const response = await fetch(`${IP_ADDR}/api/auth/register`, {
+      const response = await fetch(`http://13.201.98.12:4000/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ auth_method: "email", email, password }),
@@ -86,77 +93,76 @@ const EmailSignup = () => {
     }
   };
 
-  
-
   return (
     <StyledView>
       {/* Email Input */}
       <StyledTextInput
-        className="p-4 mb-4 text-base text-gray-800 border border-gray-300 rounded-xl"
+        className={`p-4 mb-4 text-base ${theme.colors.black} border ${
+          isEmailFocused ? "border-[#0088b1]" : "border-gray-300"
+        } rounded-xl`}
         placeholder="Enter Email"
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
         returnKeyType="done"
-        placeholderTextColor="gray"
-      />
-
-      {/* Password Input */}
-      <StyledTextInput
-        className="p-4 mb-4 text-base text-gray-800 border border-gray-300 rounded-xl"
-        placeholder="Enter Password"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={setPassword}
-        returnKeyType="done"
-        placeholderTextColor="gray"
+        placeholderTextColor="#b3b3b3"
+        onFocus={() => setIsEmailFocused(true)}
+        onBlur={() => setIsEmailFocused(false)}
       />
 
       {/* Password Input with Eye Icon */}
       <StyledView className="relative">
-        <StyledTextInput
-          className="p-4 pr-12 mb-4 text-base text-gray-800 border border-gray-300 rounded-xl"
-          placeholder="Enter Password"
-          secureTextEntry={!isPasswordVisible} // ✅ Toggle secureTextEntry
+      <StyledTextInput
+          className={`p-4 pr-12 mb-4 text-base ${theme.colors.black} border ${
+            isPasswordFocused ? "border-[#0088b1]" : "border-gray-300"
+          } rounded-xl`}
+          placeholder="**********"
+          secureTextEntry={!isPasswordVisible} 
           value={password}
           onChangeText={setPassword}
           returnKeyType="done"
-          placeholderTextColor="gray"
+          placeholderTextColor="#b3b3b3"
+          onFocus={() => setIsPasswordFocused(true)}
+          onBlur={() => setIsPasswordFocused(false)}
         />
         <StyledTouchableOpacity
-          className="absolute right-4 top-6"
+          className="absolute pl-3 pr-3 right-4 top-4"
           onPress={() => setIsPasswordVisible(!isPasswordVisible)} // ✅ Toggle Password Visibility
         >
-          {isPasswordVisible ? <EyeOff size={22} color="#808080" /> : <Eye size={22} color="#808080" />}
+          {isPasswordVisible ? <EyeOff size={24} color="#0088b1" /> : <Eye size={24} color="#0088b1" />}
         </StyledTouchableOpacity>
       </StyledView>
 
       {/* Confirm Password Input */}
       <StyledView className="relative">
-        <StyledTextInput
-          className="p-4 pr-12 text-base text-gray-800 border border-gray-300 rounded-xl"
+      <StyledTextInput
+          className={`p-4 pr-12 text-base ${theme.colors.black} border ${
+            isConfirmPasswordFocused ? "border-[#0088b1]" : "border-gray-300"
+          } rounded-xl`}
           placeholder="Confirm Password"
-          secureTextEntry={!isConfirmPasswordVisible} // ✅ Toggle secureTextEntry
+          secureTextEntry={!isConfirmPasswordVisible}
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           returnKeyType="done"
-          placeholderTextColor="gray"
+          placeholderTextColor="#b3b3b3"
+          onFocus={() => setIsConfirmPasswordFocused(true)}
+          onBlur={() => setIsConfirmPasswordFocused(false)}
         />
         <StyledTouchableOpacity
-          className="absolute right-4 top-6"
+          className="absolute pl-3 pr-3 right-4 top-4"
           onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)} // ✅ Toggle Confirm Password Visibility
         >
-          {isConfirmPasswordVisible ? <EyeOff size={22} color="#808080" /> : <Eye size={22} color="#808080" />}
+          {isConfirmPasswordVisible ? <EyeOff size={24} color="#0088b1" /> : <Eye size={24} color="#0088b1" />}
         </StyledTouchableOpacity>
       </StyledView>
 
       {/* Sign-Up Button */}
       <StyledTouchableOpacity
-        className="bg-[#0088B1] p-4 rounded-xl items-center mt-5"
+        className="bg-[#0088B1] p-4 rounded-xl items-center mt-5 "
         onPress={handleSignUp}
         disabled={loading}
       >
-        {loading ? <ActivityIndicator color="#ffffff" /> : <StyledText className="text-lg font-bold text-white">Sign Up</StyledText>}
+        {loading ? <ActivityIndicator color="#ffffff" /> : <StyledText className={`text-lg font-bold ${theme.colors.white}`}>Sign Up</StyledText>}
       </StyledTouchableOpacity>
 
       {/* OTP Modal */}
@@ -166,7 +172,6 @@ const EmailSignup = () => {
         email={email}
         password={email}
       />
-
     </StyledView>
   );
 };

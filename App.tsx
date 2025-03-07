@@ -23,7 +23,7 @@ const App = () => {
     // Simulate splash screen delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000);
+    }, 2800);
 
     return () => clearTimeout(timer);
   }, []);
