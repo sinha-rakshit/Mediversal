@@ -39,8 +39,8 @@ const ToggleButtons = ({ isMobile, setIsMobile }) => {
   };
 
   return (
-    <StyledView className="flex-row items-center p-1 mb-6 bg-[#e8f4f7] rounded-xl">
-      <StyledView className={`flex-row flex-1 overflow-hidden bg-[#f8f8f8] rounded-lg`}>
+    <StyledView className="flex-row items-center p-1 mb-6 bg-[#E8F4F7] rounded-xl">
+      <StyledView className={`flex-row flex-1 overflow-hidden bg-[#F8F8F8] rounded-lg`}>
         {["Mobile Number", "Email"].map((label, index) => {
           const selected = isMobile === (index === 0);
           return (
@@ -49,7 +49,7 @@ const ToggleButtons = ({ isMobile, setIsMobile }) => {
               className={`flex-1 p-3 items-center ${selected ? "bg-[#0088B1] rounded-lg" : ""}`}
               onPress={() => handleToggle(index === 0)}
             >
-              <StyledCustomText className={`text-lg ${selected ? "text-[#f8f8f8] font-bold" : "text-gray-600"}`}>
+              <StyledCustomText className={`text-sm ${selected ? "text-[#f8f8f8] font-semibold" : "text-gray-600"}`}>
                 {label}
               </StyledCustomText>
             </StyledTouchableOpacity>
