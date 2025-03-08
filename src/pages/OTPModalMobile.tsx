@@ -132,7 +132,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
         {/* ✅ Timer & Resend OTP */}
         <StyledView className="flex-row items-center justify-center w-full px-5 mt-3 mb-3">
           {timer > 0 ? (
-            <StyledText className="font-bold text-center">
+            <StyledText className="font-medium text-center">
               <StyledText className={`${theme.colors.gray}`}>Didn't get OTP? Resend in </StyledText>
               <StyledText className={`${theme.colors.primary}`}>{timer}s</StyledText>
             </StyledText>
@@ -155,7 +155,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
           disabled={!isOtpFilled}
         >
           <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
-            Verify OTP
+            Verify & Conitnue
           </StyledText>
         </StyledTouchableOpacity>
       </StyledView>
