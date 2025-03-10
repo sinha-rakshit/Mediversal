@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, BackHandler } from "react-native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
 import { theme } from "../assets/theme";
@@ -110,7 +110,8 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
   const isOtpFilled = otp.every((digit) => digit !== "");
 
   return (
-    <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
+    <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }} 
+      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
       <StyledView className="items-center px-8 py-8  bg-[#f8f8f8] rounded-t-3xl">
         <StyledView className="self-start">
           <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>

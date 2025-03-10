@@ -2,6 +2,9 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+
+def enableSeparateBuildPerCPUArchitecture = true 
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -93,6 +96,15 @@ android {
             keyPassword 'android'
         }
     }
+    splits {
+        abi {
+            enable enableSeparateBuildPerCPUArchitecture
+            reset()
+            include 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            universalApk true
+        }
+    }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
