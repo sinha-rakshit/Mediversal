@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
 import { Eye, EyeOff } from "lucide-react-native";
 import { theme } from "../assets/theme";
 import { IP_ADDR } from "@env";
+import { RootStackParamList } from "../navigation/navigation"; 
 import SuccessAnimation from "./SuccessAnimation";
 
 // ✅ Styled Components
@@ -21,6 +23,7 @@ interface ResetPasswordModalProps {
 }
 
 const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onClose, email, jwt }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -69,7 +72,23 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
 
       const responseData = await response.json();
       setLoading(false);
-      Alert.alert("Response", JSON.stringify(responseData));
+      if (response.ok || responseData.stringify()=="Password updated successfully") {
+        console.log("Password reset successful. Showing animation...");
+
+        // ✅ Show success animation screen
+        navigation.navigate("SuccessAnimation");
+
+        // ✅ Wait for 2 seconds, then navigate to Login
+        setTimeout(() => {
+          console.log("Navigating to Login screen...");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          });
+        }, 3500); // Adjust delay if needed
+      } else {
+        Alert.alert("Error", responseData.message || "Something went wrong.");
+      }
     } catch (error) {
       setLoading(false);
       Alert.alert("Error", "Something went wrong. Please try again.");
@@ -78,7 +97,6 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
 
   return (
     <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
-      
       <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-3xl">
         <StyledView className="self-start pl-3">
           <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>

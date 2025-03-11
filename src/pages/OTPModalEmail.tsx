@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, BackHandler } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
 import { theme } from "../assets/theme";
 import { IP_ADDR } from "@env";
+import { RootStackParamList } from "../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -19,6 +21,7 @@ interface OTPModalProps {
 }
 
 const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, password }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
@@ -72,9 +75,11 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
       const data = await response.json();
       setLoading(false);
 
-      if (response.ok) {
-        Alert.alert("Success", data.message || "OTP Verified Successfully!");
-        onClose();
+      if (response.ok && data.message == "OTP verified successfully") {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        });
       } else {
         Alert.alert("Error", data.message || "Invalid OTP, please try again.");
       }
@@ -136,7 +141,7 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
 
         
         {/* ✅ OTP Input Row */}
-        <StyledView className="flex-row justify-center space-x-3">
+        <StyledView className="flex-row justify-center space-x-2">
           {otp.map((digit, index) => (
             <StyledTextInput
               key={index}

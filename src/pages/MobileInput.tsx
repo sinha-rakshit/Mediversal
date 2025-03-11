@@ -120,8 +120,8 @@ const MobileInput = () => {
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <StyledText className={`text-lg font-medium text-center ${theme.colors.white}`}>
-            Send the OTP
+          <StyledText className={`text-base font-medium text-center text-[#F8F8F8]`}>
+            Send OTP
           </StyledText>
         )}
       </StyledTouchableOpacity>

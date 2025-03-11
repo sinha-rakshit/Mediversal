@@ -7,11 +7,13 @@ import {
   Alert,
   ActivityIndicator
 } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { styled } from "nativewind";
 import ForgotPasswordEmailModal from "./ForgotPasswordEmailModal"; // ✅ Updated Import
 import { IP_ADDR } from "@env";
 import { Eye, EyeOff } from "lucide-react-native"; // 👀 Import password toggle icons
 import { theme } from "../assets/theme";
+import { RootStackParamList } from "../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -20,6 +22,7 @@ const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 
 const EmailLogin = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [credentials, setCredentials] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -74,7 +77,7 @@ const EmailLogin = () => {
       setLoading(false);
 
       if (response.ok && data.user) {
-        Alert.alert("Success", "Logged in successfully!");
+        navigation.navigate("HomeScreen");
       } else {
         Alert.alert("Login Failed", data.message || "Invalid credentials.");
       }

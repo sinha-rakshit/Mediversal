@@ -23,8 +23,6 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
   const [showResetModal, setShowResetModal] = useState(false);
   const [jwtToken, setJwtToken] = useState<string | null>(null);
   const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
-  const [isEmailEditable, setIsEmailEditable] = useState(false);
-  const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [timer, setTimer] = useState(30);
   
   useEffect(() => {
@@ -115,7 +113,8 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
 
   return (
     <>
-      <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
+      <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}
+      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
         <StyledView className="items-center p-8 bg-[#f8f8f8] rounded-t-3xl">
           <StyledView className="items-left">
             <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>
@@ -127,10 +126,7 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
 
             {/* ✅ Wrong Email? Change Email */}
           <StyledView className="self-start">
-            <StyledTouchableOpacity onPress={() => {
-              setIsEmailEditable(true);
-              setIsEmailFocused(true);
-            }}>
+            <StyledTouchableOpacity onPress={onClose}>
               <StyledText className="mb-3 text-base font-regular">
                 <StyledText className={`${theme.colors.gray}`}>Wrong Email? </StyledText>
                 <StyledText className="text-[#0088B1]">Change Email</StyledText>
@@ -142,25 +138,20 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
 
           {/* ✅ Editable Email Input */}
           <StyledView
-            className={`self-start w-full p-2 mb-3 border ${
-              isEmailEditable || isEmailFocused ? "border-[#0088B1]" : "border-gray-300"
-            } rounded-lg`}
+            className={`self-start w-full p-2 mb-3 border border-gray-300 rounded-lg`}
           >
             <StyledTextInput
-              className="text-base text-black"
+              className={`text-base ${theme.colors.gray}`}
               value={userEmail}
               onChangeText={setUserEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              editable={isEmailEditable}
-              onFocus={() => setIsEmailFocused(true)}
-              onBlur={() => setIsEmailFocused(false)}
             />
           </StyledView>
 
           
           {/* ✅ OTP Input Row */}
-          <StyledView className="flex-row justify-center space-x-3">
+          <StyledView className="flex-row justify-center space-x-2">
             {otp.map((digit, index) => (
               <StyledTextInput
                 key={index}

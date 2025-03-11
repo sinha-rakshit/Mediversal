@@ -1,10 +1,12 @@
 import React from "react";
 import { TouchableOpacity, Text, Image, Alert, View } from "react-native";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { styled } from "nativewind";
 import { theme } from "../assets/theme";
 import { IP_ADDR } from "@env"; // ✅ Load API URL from .env
 import GoogleIcon from "../assets/photos/googleIcon.svg";
+import { RootStackParamList } from "../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledTouchableOpacity = styled(TouchableOpacity);
@@ -19,6 +21,7 @@ GoogleSignin.configure({
 });
 
 const GoogleLoginButton = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const handleGoogleLogin = async () => {
     try {
       await GoogleSignin.hasPlayServices();
@@ -43,7 +46,7 @@ const GoogleLoginButton = () => {
       const data = await response.json();
 
       if (response.ok && data.user && data.jwt) {
-        Alert.alert("Success", "Google login successful!");
+        navigation.navigate("HomeScreen");
       } else {
         Alert.alert("Login Failed", data.error || "An error occurred.");
       }

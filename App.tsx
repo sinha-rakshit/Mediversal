@@ -3,6 +3,7 @@ import { SafeAreaView } from "react-native";
 import LoginScreen from "./src/pages/loginMobile";
 import SplashScreen from "./src/pages/homeScreen/SplashScreen";
 import { setCustomText } from "react-native-global-props";
+import AppNavigator from "./src/navigation/navigation";
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,14 +24,14 @@ const App = () => {
     // Simulate splash screen delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2800);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {isLoading ? <SplashScreen /> : <LoginScreen />}
+      {isLoading ? <SplashScreen /> : <AppNavigator />}
     </SafeAreaView>
   );
 };

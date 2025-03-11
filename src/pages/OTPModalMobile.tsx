@@ -1,10 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, BackHandler } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
 import { theme } from "../assets/theme";
 import axios from "axios";
 import { IP_ADDR } from "@env";
+import HomeScreen from "./HomeScreen";
+import { RootStackParamList } from "../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -20,6 +23,7 @@ interface OTPModalProps {
 }
 
 const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack, phoneNumber }) => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [timer, setTimer] = useState(60);
   const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
@@ -70,7 +74,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
       const { jwt, message } = response.data;
 
       if (jwt) {
-        Alert.alert("OTP Verified", "Next part is under development.");
+        navigation.navigate("HomeScreen");
       } else {
         Alert.alert("Error", message || "Invalid OTP. Try again.");
       }
@@ -98,20 +102,29 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
   const isOtpFilled = otp.every((digit) => digit !== "");
 
   return (
-    <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
+    <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}
+    onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
       <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-3xl">
         <StyledView className="self-start pl-3">
           <StyledText className={`mb-3 text-3xl font-bold ${theme.colors.primary}`}>
             6-Digit OTP
           </StyledText>
-          <StyledText className={`mb-3 text-base pb-4 ${theme.colors.gray}`}>
+          <StyledText className={` text-base pb-4 ${theme.colors.gray}`}>
             OTP sent to {phoneNumber} for verification.
             Please enter the code here.
           </StyledText>
+
+        {/* ✅ Wrong Email? Change Email */}
+          <StyledTouchableOpacity onPress={onClose}>
+            <StyledText className="mb-6 text-base font-regular">
+              <StyledText className={`${theme.colors.gray}`}>Wrong Email? </StyledText>
+              <StyledText className="text-[#0088B1]">Edit Number</StyledText>
+            </StyledText>
+          </StyledTouchableOpacity>
         </StyledView>
 
         {/* ✅ OTP Input Row */}
-        <StyledView className="flex-row justify-center space-x-3">
+        <StyledView className="flex-row justify-center space-x-2">
           {otp.map((digit, index) => (
             <StyledTextInput
               key={index}
@@ -132,13 +145,13 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
         {/* ✅ Timer & Resend OTP */}
         <StyledView className="flex-row items-center justify-center w-full px-5 mt-3 mb-3">
           {timer > 0 ? (
-            <StyledText className="font-bold text-center">
+            <StyledText className="font-medium text-center">
               <StyledText className={`${theme.colors.gray}`}>Didn't get OTP? Resend in </StyledText>
               <StyledText className={`${theme.colors.primary}`}>{timer}s</StyledText>
             </StyledText>
           ) : (
             <StyledTouchableOpacity onPress={handleResendOTP}>
-              <StyledText className={`font-bold text-center ${theme.colors.primary}`}>
+              <StyledText className={`font-medium text-center ${theme.colors.primary}`}>
                 Resend OTP
               </StyledText>
             </StyledTouchableOpacity>
@@ -155,7 +168,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
           disabled={!isOtpFilled}
         >
           <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
-            Verify OTP
+            Verify & Continue
           </StyledText>
         </StyledTouchableOpacity>
       </StyledView>

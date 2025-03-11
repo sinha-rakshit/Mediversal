@@ -68,9 +68,9 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
       <Modal
         isVisible={isVisible}
         animationIn="slideInUp"
-        animationOut="slideOutDown"
         backdropOpacity={0.5}
         style={{ margin: 0, justifyContent: "flex-end" }}
+        onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}
       >
         <StyledView className="w-full p-8 bg-white rounded-t-3xl">
           {/* Title */}
@@ -120,6 +120,15 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
                 Send OTP
               </StyledText>
             )}
+          </StyledTouchableOpacity>
+
+
+          {/* ✅ Support Text */}
+          <StyledTouchableOpacity className="items-center mt-5 text-sm">
+            <StyledText className={` ${theme.colors.gray}`}>
+              Trouble resetting?{" "}
+              <StyledText className={`${theme.colors.black}`}>Contact Support</StyledText>
+            </StyledText>
           </StyledTouchableOpacity>
         </StyledView>
       </Modal>
