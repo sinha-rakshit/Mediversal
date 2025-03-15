@@ -8,7 +8,7 @@ const HomeScreen = () => {
       <View style={styles.animationContainer}>
         {/* Insert your Lottie animation JSON file inside the source prop */}
         <LottieView 
-          source={require('../assets/lottie/MainScene.json')} 
+          source={require('../../assets/lottie/MainScene.json')} 
           autoPlay 
           loop 
           style={styles.lottieStyle}

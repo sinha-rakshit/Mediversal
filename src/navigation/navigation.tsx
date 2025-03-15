@@ -1,10 +1,10 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
-import LoginScreen from "../pages/loginMobile";
-import SignupEmail from "../pages/signupEmail";
-import HomeScreen from "../pages/HomeScreen";
-import SuccessAnimation from "../pages/SuccessAnimation";
+import LoginScreen from "../screens/auth/LoginScreen";
+import SignupEmail from "../screens/auth/signupEmail";
+import HomeScreen from "../screens/main/HomeScreen";
+import SuccessAnimation from "../screens/animation/SuccessAnimation";
 
 export type RootStackParamList = {
   Login: undefined;

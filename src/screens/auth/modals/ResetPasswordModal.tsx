@@ -4,10 +4,9 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
 import { Eye, EyeOff } from "lucide-react-native";
-import { theme } from "../assets/theme";
+import { theme } from "../../../config/theme";
 import { IP_ADDR } from "@env";
-import { RootStackParamList } from "../navigation/navigation"; 
-import SuccessAnimation from "./SuccessAnimation";
+import { RootStackParamList } from "../../../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -58,7 +57,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
     setLoading(true);
 
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/resetpassword`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/resetpassword`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,12 +96,12 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
 
   return (
     <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}>
-      <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-3xl">
+      <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-[40px]">
         <StyledView className="self-start pl-3">
           <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>
-            Reset Password
+            Create New Password
           </StyledText>
-          <StyledText className={`mb-3 ${theme.font.sizeLg} ${theme.colors.gray}`}>
+          <StyledText className={`mb-6 text-base ${theme.colors.gray}`}>
             Set a new password. Make sure it's different from the previous one.
           </StyledText>
         </StyledView>
@@ -113,7 +112,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
             className={`w-full p-4 pr-12 mb-3 ${theme.colors.black} text-lg border ${
               isPasswordFocused ? "border-[#0088b1]" : "border-gray-300"
             } rounded-lg`}
-            placeholder="********"
+            placeholder="New Password"
             secureTextEntry={!isPasswordVisible}
             value={password}
             onChangeText={setPassword}
@@ -157,7 +156,7 @@ const ResetPasswordModal: React.FC<ResetPasswordModalProps> = ({ isVisible, onCl
           onPress={handleResetPassword}
           disabled={loading}
         >
-          {loading ? <ActivityIndicator color="[#f8f8f8]" /> : <StyledText className="text-lg font-bold text-[#f8f8f8]">Update Password</StyledText>}
+          {loading ? <ActivityIndicator color="[#f8f8f8]" /> : <StyledText className={`text-base font-regular text-[#f8f8f8]`}>Update Password</StyledText>}
         </StyledTouchableOpacity>
       </StyledView>
     </Modal>

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { styled } from "nativewind";
-import OTPModalEmail from "./OTPModalEmail";
+import OTPSignUpModal from "./modals/OtpSignUpModal";
 import { Eye, EyeOff } from "lucide-react-native";
 import { IP_ADDR } from "@env";
-import { theme } from "../assets/theme";
-import LoginScreen from "./loginMobile"; // ✅ Import LoginScreen
-import { useNavigation } from "@react-navigation/native"; // ✅ Import navigation hook
+import { theme } from "../../config/theme";
+import OtpSignUpModal from "./modals/OtpSignUpModal";
+import GoogleLoginButton from "../../assets/components/GoogleLoginButton";
 
 // ✅ Styled Components
 const StyledView = styled(View);
 const StyledText = styled(Text);
 const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
+const StyledCustomText = styled(Text);
 
 const EmailSignup = () => {
   const [email, setEmail] = useState("");
@@ -25,6 +26,14 @@ const EmailSignup = () => {
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+
+  const DividerWithText = ({ text }) => (
+    <StyledView className="flex-row items-center py-8">
+      <StyledView className="flex-1 h-[1px] bg-gray-300" />
+      <StyledCustomText className="font-regular text-gray-400 text-[16px]">{text}</StyledCustomText>
+      <StyledView className="flex-1 h-[1px] bg-gray-300" />
+    </StyledView>
+  );
   
 
   // ✅ Email validation regex
@@ -162,11 +171,18 @@ const EmailSignup = () => {
         onPress={handleSignUp}
         disabled={loading}
       >
-        {loading ? <ActivityIndicator color="#ffffff" /> : <StyledText className={`text-lg font-bold ${theme.colors.white}`}>Sign Up</StyledText>}
+        {loading ? <ActivityIndicator color="#ffffff" /> : <StyledText className={`text-base font-regular ${theme.colors.white}`}>Create Account</StyledText>}
       </StyledTouchableOpacity>
 
+      {/* Divider and Google Sign-Up Button */}
+      <DividerWithText text="or Login with" />
+      <StyledView className="pb-4">
+      <GoogleLoginButton />
+      </StyledView>
+      
+
       {/* OTP Modal */}
-      <OTPModalEmail 
+      <OtpSignUpModal 
         isVisible={isOTPModalVisible} 
         onClose={() => setOTPModalVisible(false)} 
         email={email}

@@ -3,11 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, Alert, BackHandler } from "rea
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
-import { theme } from "../assets/theme";
+import { theme } from "../../../config/theme";
 import axios from "axios";
 import { IP_ADDR } from "@env";
-import HomeScreen from "./HomeScreen";
-import { RootStackParamList } from "../navigation/navigation"; 
+import { RootStackParamList } from "../../../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -22,7 +21,7 @@ interface OTPModalProps {
   phoneNumber: string;
 }
 
-const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack, phoneNumber }) => {
+const OtpMobileModal: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack, phoneNumber }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [timer, setTimer] = useState(60);
@@ -43,16 +42,44 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
   }, [isVisible, timer]);
 
   const handleOTPChange = (value: string, index: number) => {
-    if (!/^[0-9]?$/.test(value)) return;
-
+    if (!/^\d*$/.test(value)) return; // Allow only numbers
+  
     const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    } else if (!value && index > 0) {
+  
+    if (value.length > 1) {
+      // Handle full OTP paste
+      const pastedValues = value.split("").slice(0, 6); // Ensure max length of 6
+      pastedValues.forEach((char, i) => {
+        newOtp[i] = char;
+      });
+      setOtp(newOtp);
+      inputRefs.current[5]?.focus(); // Move focus to the last input
+    } else {
+      // Handle single character input
+      newOtp[index] = value;
+      setOtp(newOtp);
+  
+      if (value && index < 5) {
+        inputRefs.current[index + 1]?.focus();
+      }
+    }
+  };
+  
+  const handleKeyPress = (event: any, index: number) => {
+    if (event.nativeEvent.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (event: any) => {
+    const pastedText = event.nativeEvent.text;
+    
+    if (/^\d{6}$/.test(pastedText)) {
+      // ✅ Distribute pasted OTP
+      setOtp(pastedText.split(""));
+      
+      // Move focus to the last input
+      inputRefs.current[5]?.focus();
     }
   };
 
@@ -65,7 +92,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
     }
 
     try {
-      const response = await axios.post(`http://13.201.98.12:4000/api/auth/verifyotp`, {
+      const response = await axios.post(`${IP_ADDR}/api/auth/verifyotp`, {
         phone: phoneNumber,
         otp: enteredOTP,
         auth_method: "phone",
@@ -85,7 +112,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post(`http://13.201.98.12:4000/api/auth/register`, {
+      const response = await axios.post(`${IP_ADDR}/api/auth/register`, {
         phone: phoneNumber,
         auth_method: "phone",
       });
@@ -103,21 +130,21 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
 
   return (
     <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}
-    onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
-      <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-3xl">
+    onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250} onBackdropPress={onClose}>
+      <StyledView className="items-center p-5 bg-[#f8f8f8] rounded-t-[40px]">
         <StyledView className="self-start pl-3">
           <StyledText className={`mb-3 text-3xl font-bold ${theme.colors.primary}`}>
             6-Digit OTP
           </StyledText>
           <StyledText className={` text-base pb-4 ${theme.colors.gray}`}>
-            OTP sent to {phoneNumber} for verification.
+            OTP sent to {phoneNumber} for verification. {'\n'}
             Please enter the code here.
           </StyledText>
 
         {/* ✅ Wrong Email? Change Email */}
           <StyledTouchableOpacity onPress={onClose}>
             <StyledText className="mb-6 text-base font-regular">
-              <StyledText className={`${theme.colors.gray}`}>Wrong Email? </StyledText>
+              <StyledText className={`${theme.colors.gray}`}>Wrong number? </StyledText>
               <StyledText className="text-[#0088B1]">Edit Number</StyledText>
             </StyledText>
           </StyledTouchableOpacity>
@@ -127,18 +154,27 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
         <StyledView className="flex-row justify-center space-x-2">
           {otp.map((digit, index) => (
             <StyledTextInput
-              key={index}
-              ref={(el) => {
-                inputRefs.current[index] = el as TextInput | null;
-              }}
-              className={`w-12 h-12 text-lg font-bold text-center border ${
-                digit ? "border-[#0088B1]" : "border-gray-300"
-              } rounded-lg`}
-              keyboardType="numeric"
-              maxLength={1}
-              value={digit}
-              onChangeText={(value) => handleOTPChange(value, index)}
-            />
+            key={index}
+            ref={(el) => {
+              inputRefs.current[index] = el as TextInput | null;
+            }}            
+            className={`w-12 h-12 text-lg font-bold text-center border ${
+              otp[index] ? "border-[#0088B1]" : "border-gray-300"
+            } rounded-lg`}
+            keyboardType="numeric"
+            maxLength={1}
+            value={otp[index]}
+            onChangeText={(value) => handleOTPChange(value, index)}
+            onKeyPress={(event) => handleKeyPress(event, index)}
+            onFocus={() => {
+              setOtp((prevOtp) => {
+                const newOtp = [...prevOtp];
+                newOtp[index] = ""; // Clear field when focused
+                return newOtp;
+              });
+            }}
+            onChange={handlePaste} // ✅ Detect full paste
+          />
           ))}
         </StyledView>
 
@@ -167,7 +203,7 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
           onPress={isOtpFilled ? handleVerifyOTP : () => {}}
           disabled={!isOtpFilled}
         >
-          <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
+          <StyledText className={`text-base font-regular ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
             Verify & Continue
           </StyledText>
         </StyledTouchableOpacity>
@@ -176,4 +212,4 @@ const OTPModalMobile: React.FC<OTPModalProps> = ({ isVisible, onClose, onGoBack,
   );
 };
 
-export default OTPModalMobile;
+export default OtpMobileModal;

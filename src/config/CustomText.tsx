@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { Text, TextProps } from "react-native";
 import { styled } from "nativewind";
-import Constants from "../assets/constants"; 
+import Constants from "../config/constants"; 
 
 const StyledText = styled(Text);
 

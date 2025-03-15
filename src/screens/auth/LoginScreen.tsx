@@ -13,13 +13,13 @@
     Alert
   } from "react-native";
   import { styled } from "nativewind";
-  import { theme } from "../assets/theme";
+  import { theme } from "../../config/theme";
   import EmailLogin from "./loginEmail";
-  import MobileInput from "./MobileInput";
+  import MobileLogin from "./loginMobile";
   import EmailSignup from "./signupEmail";
-  import GoogleLoginButton from "./GoogleLoginButton";
-  import CustomText from "./CustomText";
-  import { useNavigation } from "@react-navigation/native";
+  import GoogleLoginButton from "../../assets/components/GoogleLoginButton";
+  import CustomText from "../../config/CustomText";
+  import CarouselSVG from "../../assets/photos/Carosel.svg";
 
   // ✅ Enable LayoutAnimation for Android
   if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -67,16 +67,8 @@
     const [isMobile, setIsMobile] = useState(true);
     const [isSignup, setIsSignup] = useState(false);
 
-    const headerText = useMemo(() => (isSignup ? "Welcome Aboard!!" : "Welcome Back!"), [isSignup]);
+    const headerText = useMemo(() => (isSignup ? "Welcome Aboard!!" : "Welcome To"), [isSignup]);
     const subHeaderText = useMemo(() => (isSignup ? "Create Account" : "Please, Log In."), [isSignup]);
-
-    const DividerWithText = ({ text }) => (
-      <StyledView className="flex-row items-center py-6">
-        <StyledView className="flex-1 h-[1px] bg-gray-300" />
-        <StyledCustomText className="font-semibold text-gray-500 text-[16px] p-4">{text}</StyledCustomText>
-        <StyledView className="flex-1 h-[1px] bg-gray-300" />
-      </StyledView>
-    );
 
     // 🟢 Handle Android Back Button
     useEffect(() => {
@@ -113,61 +105,72 @@
           <StyledView className="items-center justify-center flex-1">
             {(isMobile || isSignup) && (
               <StyledView className="p-8">
-                <StyledImage 
-                  source={require("../assets/photos/Carosel.png")} 
-                  className="w-70 h-70" 
-                  resizeMode="contain" 
-                />
+                <CarouselSVG width={280} height={280} preserveAspectRatio="xMidYMid meet" />
               </StyledView>
             )}
-            <StyledView className="self-start pl-8">
-              <StyledCustomText className={`${theme.font.primary} ${theme.font.opacity} ${theme.colors.white} text-[20px] ${theme.font.weightMedium} pb-2`}>
+            <StyledView className="self-start py-6 pl-8">
+              <StyledCustomText className={`${theme.font.primary} ${theme.colors.white} text-[20px] ${theme.font.weightRegular} py-1`}>
                 {headerText}
               </StyledCustomText>
-              <StyledCustomText 
-                className={`${theme.font.primary} ${theme.colors.white} text-[40px] ${theme.font.weightBold}`} 
-                style={{ lineHeight: 40, paddingBottom: 8 }}
-              >
-                {subHeaderText}
-              </StyledCustomText>
+
+              {!isSignup ? (
+                <>
+                  <StyledCustomText 
+                    className={`${theme.font.primary} ${theme.colors.white} text-[40px] ${theme.font.weightBold} pb-1`} 
+                    style={{ lineHeight: 42 }}
+                  >
+                    Mediversal
+                  </StyledCustomText>
+                  <StyledCustomText 
+                    className={`${theme.font.primary} ${theme.colors.white} text-[20px] ${theme.font.weightRegular}`} 
+                    style={{ paddingBottom: 14 }}
+                  >
+                    Easy Healthcare, In Your Hands
+                  </StyledCustomText>
+                </>
+              ) : (
+                <StyledCustomText 
+                  className={`${theme.font.primary} ${theme.colors.white} text-[40px] ${theme.font.weightBold}`} 
+                  style={{ lineHeight: 42, paddingBottom: 14 }}
+                >
+                  {subHeaderText}
+                </StyledCustomText>
+              )}
             </StyledView>
           </StyledView>
 
           {/* 🟢 Bottom Section */}
-          <StyledView className="flex-1 pt-8 pl-8 pr-8 bg-[#f8f8f8] rounded-t-3xl">
+          <StyledView className="flex-1 pt-12 pl-8 pr-8 bg-[#f8f8f8] rounded-t-[40px]">
             {isSignup ? (
               <>
                 <EmailSignup />
-                <DividerWithText text="or Login with" />
-                <GoogleLoginButton />
               </>
             ) : (
               <>
                 <ToggleButtons isMobile={isMobile} setIsMobile={setIsMobile} />
-                {isMobile ? <MobileInput /> : <EmailLogin />}
-                {!isMobile && <DividerWithText text="or Login with" />}
-                {!isMobile && <GoogleLoginButton />}
+                {isMobile ? <MobileLogin /> : <EmailLogin />}
 
                 {/* "Don't have an account? Create Account" only for Email Login */}
                 {!isMobile && (
-                  <StyledView className="flex-row justify-center mt-16">
+                  <StyledView className="flex-row justify-center">
                     <StyledCustomText className={`text-sm ${theme.colors.black}`}>
-                      Don’t have an account?
+                      Don’t have an Account?
                     </StyledCustomText>
                     <StyledTouchableOpacity onPress={() => { setIsSignup(true); setIsMobile(false); }}>
-                      <StyledCustomText className="text-[#0088B1] font-bold text-sm">
+                      <StyledCustomText className="text-[#0088B1] font-semibold text-sm">
                         {" "}Create One
                       </StyledCustomText>
                     </StyledTouchableOpacity>
                   </StyledView>
                 )}
-                {/* Terms & Conditions */}
-                <StyledCustomText className={`mt-16 text-xs text-center ${theme.colors.gray}`}>
-                  By logging in, you agree to our{" "}
-                  <StyledCustomText className={`${theme.colors.black}`}>
-                    Terms & Conditions
+                {!isMobile && (
+                  <StyledCustomText className={`text-xs text-center ${theme.colors.gray} mt-10 mb-6 `}>
+                    By logging in, you agree to our{" "}
+                    <StyledCustomText className={`${theme.colors.black}`}>
+                      Terms & Conditions
+                    </StyledCustomText>
                   </StyledCustomText>
-                </StyledCustomText>
+                )}
               </>
             )}
           </StyledView>

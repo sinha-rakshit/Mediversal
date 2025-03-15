@@ -3,9 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, Back
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
-import { theme } from "../assets/theme";
+import { theme } from "../../../config/theme";
 import { IP_ADDR } from "@env";
-import { RootStackParamList } from "../navigation/navigation"; 
+import { RootStackParamList } from "../../../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -20,14 +20,14 @@ interface OTPModalProps {
   password: string;
 }
 
-const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, password }) => {
+const OtpSignUpModal: React.FC<OTPModalProps> = ({ isVisible, onClose, email, password }) => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
 
   // ✅ Timer State
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(60);
   
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -66,7 +66,7 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
 
     setLoading(true);
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/verifyotp`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/verifyotp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode, password, auth_method: "email" }),
@@ -94,7 +94,7 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
     setTimer(30); // Reset timer
 
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/register`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ auth_method: "email", email, password }),
@@ -116,8 +116,8 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
 
   return (
     <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }} 
-      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
-      <StyledView className="items-center px-8 py-8  bg-[#f8f8f8] rounded-t-3xl">
+      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250} onBackdropPress={onClose}>
+      <StyledView className="items-center px-8 py-8  bg-[#f8f8f8] rounded-t-[40px]">
         <StyledView className="self-start">
           <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>
             Email Verification
@@ -141,7 +141,7 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
 
         
         {/* ✅ OTP Input Row */}
-        <StyledView className="flex-row justify-center space-x-2">
+        <StyledView className="flex-row justify-center pl-2 space-x-2">
           {otp.map((digit, index) => (
             <StyledTextInput
               key={index}
@@ -185,8 +185,8 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
           {loading ? (
             <ActivityIndicator color="[#f8f8f8]" />
           ) : (
-            <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
-              Verify OTP
+            <StyledText className={`text-base font-regular ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
+              Verify & Continue
             </StyledText>
           )}
         </StyledTouchableOpacity>
@@ -197,4 +197,4 @@ const OTPModalEmail: React.FC<OTPModalProps> = ({ isVisible, onClose, email, pas
   );
 };
 
-export default OTPModalEmail;
+export default OtpSignUpModal;

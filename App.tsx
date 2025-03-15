@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native";
-import LoginScreen from "./src/pages/loginMobile";
-import SplashScreen from "./src/pages/homeScreen/SplashScreen";
+import LoginScreen from "./src/screens/auth/LoginScreen";
+import SplashScreen from "./src/screens/animation/SplashScreen";
 import { setCustomText } from "react-native-global-props";
 import AppNavigator from "./src/navigation/navigation";
 

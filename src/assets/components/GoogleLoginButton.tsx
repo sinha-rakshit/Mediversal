@@ -3,10 +3,10 @@ import { TouchableOpacity, Text, Image, Alert, View } from "react-native";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { styled } from "nativewind";
-import { theme } from "../assets/theme";
+import { theme } from "../../config/theme";
 import { IP_ADDR } from "@env"; // ✅ Load API URL from .env
-import GoogleIcon from "../assets/photos/googleIcon.svg";
-import { RootStackParamList } from "../navigation/navigation"; 
+import GoogleIcon from "../photos/googleIcon.svg";
+import { RootStackParamList } from "../../navigation/navigation"; 
 
 // ✅ Styled Components
 const StyledTouchableOpacity = styled(TouchableOpacity);
@@ -76,7 +76,7 @@ const GoogleLoginButton = () => {
     >
       <GoogleIcon width={24} height={24} /> 
       <StyledView className="w-[1px] h-6 bg-gray-400 mx-4" />
-      <StyledText className={`text-base font-medium ${theme.colors.black}`}>Login with Google</StyledText>
+      <StyledText className={`text-base font-regular ${theme.colors.black}`}>Login with Google</StyledText>
     </StyledTouchableOpacity>
   );
 };

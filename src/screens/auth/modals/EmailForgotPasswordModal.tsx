@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import { styled } from "nativewind";
 import Modal from "react-native-modal";
-import { theme } from "../assets/theme";
-import ForgotPasswordModal from "./ForgotPasswordModal";
+import { theme } from "../../../config/theme";
+import ForgotPasswordModal from "./OtpForgotPasswordModal";
+import { IP_ADDR } from "@env";
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -11,7 +12,7 @@ const StyledText = styled(Text);
 const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 
-const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
+const EmailForgotPasswordModal = ({ isVisible, onClose, email = "" }) => {
   const [userEmail, setUserEmail] = useState(email);
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -43,7 +44,7 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://13.201.98.12:4000/api/auth/forgotpassword", {
+      const response = await fetch(`${IP_ADDR}/api/auth/forgotpassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: userEmail }),
@@ -70,25 +71,25 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
         animationIn="slideInUp"
         backdropOpacity={0.5}
         style={{ margin: 0, justifyContent: "flex-end" }}
-        onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}
+        onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250} onBackdropPress={onClose}
       >
-        <StyledView className="w-full p-8 bg-white rounded-t-3xl">
+        <StyledView className="w-full p-8 bg-white rounded-t-[40px]">
           {/* Title */}
           <StyledView className="mb-4">
             <StyledText className="text-2xl mb-3 font-bold text-[#0088B1]">Reset Your Password</StyledText>
-            <StyledText className="mt-1 text-base text-gray-500">
-              Enter your registered email to receive a password reset link.
+            <StyledText className="pb-2 mt-1 text-base text-gray-500">
+              Please enter the registered email below to reset your password
             </StyledText>
           </StyledView>
 
           {/* ✅ Email Input */}
           <StyledView
-            className={`w-full p-2 border rounded-lg ${
+            className={`w-full p-1 border rounded-lg ${
               isEmailFocused ? "border-[#0088B1]" : "border-gray-300"
-            }`}
+            } mb-2`}
           >
             <StyledTextInput
-              className={`text-base ${theme.colors.black}`}
+              className={`text-base ${theme.colors.black} pl-2`}
               placeholder="mediversal@gmail.com"
               value={userEmail}
               onChangeText={handleEmailChange}
@@ -116,7 +117,7 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <StyledText className={`text-lg font-bold ${isValidEmail(userEmail) ? "text-white" : "text-[#0088B1]"}`}>
+              <StyledText className={`text-base font-regular ${isValidEmail(userEmail) ? "text-white" : "text-[#0088B1]"}`}>
                 Send OTP
               </StyledText>
             )}
@@ -124,11 +125,8 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
 
 
           {/* ✅ Support Text */}
-          <StyledTouchableOpacity className="items-center mt-5 text-sm">
-            <StyledText className={` ${theme.colors.gray}`}>
-              Trouble resetting?{" "}
-              <StyledText className={`${theme.colors.black}`}>Contact Support</StyledText>
-            </StyledText>
+          <StyledTouchableOpacity className="items-center pb-2 mt-5 text-sm">
+            <StyledText className={`${theme.colors.black} ${theme.font.primary}`}>Need Help?</StyledText>
           </StyledTouchableOpacity>
         </StyledView>
       </Modal>
@@ -145,4 +143,4 @@ const ForgotPasswordEmailModal = ({ isVisible, onClose, email = "" }) => {
   );
 };
 
-export default ForgotPasswordEmailModal;
+export default EmailForgotPasswordModal;

@@ -9,11 +9,13 @@ import {
 } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { styled } from "nativewind";
-import ForgotPasswordEmailModal from "./ForgotPasswordEmailModal"; // ✅ Updated Import
+import EmailForgotPasswordModal from "./modals/EmailForgotPasswordModal"; // ✅ Updated Import
 import { IP_ADDR } from "@env";
 import { Eye, EyeOff } from "lucide-react-native"; // 👀 Import password toggle icons
-import { theme } from "../assets/theme";
-import { RootStackParamList } from "../navigation/navigation"; 
+import { theme } from "../../config/theme";
+import { RootStackParamList } from "../../navigation/navigation"; 
+import GoogleLoginButton from "../../assets/components/GoogleLoginButton";
+import { G } from "react-native-svg";
 
 // ✅ Styled Components
 const StyledView = styled(View);
@@ -30,6 +32,14 @@ const EmailLogin = () => {
   const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isEmailFocused, setIsEmailFocused] = useState(false);  
+
+  const DividerWithText = ({ text }) => (
+        <StyledView className="flex-row items-center py-8">
+          <StyledView className="flex-1 h-[1px] bg-gray-300" />
+          <StyledText className="font-regular text-gray-400 text-[16px] px-4 py-2">{text}</StyledText>
+          <StyledView className="flex-1 h-[1px] bg-gray-300" />
+        </StyledView>
+      );
 
   // ✅ Validate user input
   const validateInput = () => {
@@ -67,7 +77,7 @@ const EmailLogin = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/login`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -157,13 +167,25 @@ const EmailLogin = () => {
         {loading ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
-          <StyledText className={`text-base font-medium ${theme.colors.white}`}>Login</StyledText>
+          <StyledText className={`text-base font-regular ${theme.colors.white}`}>Login</StyledText>
         )}
       </StyledTouchableOpacity>
 
+      <DividerWithText text="or Login with" />
+      <GoogleLoginButton />
+
+      <StyledView className="flex-row justify-center m-8">
+        <StyledTouchableOpacity onPress={() => {/* Add Help Functionality Here */}}>
+          <StyledText className={`${theme.colors.black} font-regular text-sm`}>
+            Need Help?
+          </StyledText>
+        </StyledTouchableOpacity>
+      </StyledView>
+      
+
       {/* Forgot Password Email Modal */}
       {forgotPasswordVisible && (
-        <ForgotPasswordEmailModal
+        <EmailForgotPasswordModal
         isVisible={forgotPasswordVisible}
         onClose={() => setForgotPasswordVisible(false)}
         email={credentials.email}

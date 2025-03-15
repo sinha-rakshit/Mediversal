@@ -7,7 +7,7 @@ const SuccessAnimation: React.FC = () => {
     <View style={styles.container}>
       {/* Lottie Animation */}
       <LottieView
-        source={require("../assets/lottie/SuccessScreen.json")}
+        source={require("../../assets/lottie/SuccessScreen.json")}
         autoPlay
         loop={false}
         style={styles.lottie}

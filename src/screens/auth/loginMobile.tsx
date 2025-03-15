@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { View, TextInput, Alert, TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import { styled } from "nativewind";
-import CountryPickerComponent from "./CountryPicker";
-import OTPModalMobile from "./OTPModalMobile"; 
+import CountryPickerComponent from "../../assets/components/CountryPicker";
+import OTPMobileModal from "./modals/OtpMobileModal"; 
 import { IP_ADDR } from "@env";
-import { theme } from "../assets/theme";
+import { theme } from "../../config/theme";
 
 // ✅ Styled Components
 const StyledView = styled(View);
 const StyledTextInput = styled(TextInput);
 const StyledTouchableOpacity = styled(TouchableOpacity);
 const StyledText = styled(Text);
+const StyledCustomText = styled(Text);
 
-const MobileInput = () => {
+const MobileLogin = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [selectedCountry, setSelectedCountry] = useState({
     callingCode: ["91"], // Default to India
@@ -47,7 +48,7 @@ const MobileInput = () => {
   
     try {
       const response = (await Promise.race([
-        fetch(`http://13.201.98.12:4000/api/auth/register`, {
+        fetch(`${IP_ADDR}/api/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ phone: mobileNumber, auth_method:"phone"}),
@@ -81,8 +82,6 @@ const MobileInput = () => {
     }
   };
   
-
-
   return (
     <StyledView className="flex-col items-center w-full mt-2">
       <StyledView className="flex-row items-center w-full space-x-3">
@@ -120,15 +119,23 @@ const MobileInput = () => {
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <StyledText className={`text-base font-medium text-center text-[#F8F8F8]`}>
+          <StyledText className={`text-base font-regular text-center text-[#F8F8F8]`}>
             Send OTP
           </StyledText>
         )}
       </StyledTouchableOpacity>
 
+      {/* Terms & Conditions */}
+      <StyledText className={`text-xs text-center ${theme.colors.gray} p-10 `}>
+        By logging in, you agree to our{" "}
+        <StyledText className={`${theme.colors.black}`}>
+          Terms & Conditions
+        </StyledText>
+      </StyledText>
+
       {/* ✅ OTP Modal */}
       {isOTPModalVisible && (
-        <OTPModalMobile
+        <OTPMobileModal
         isVisible={isOTPModalVisible}
         onClose={() => setOTPModalVisible(false)}
         phoneNumber={`${mobileNumber}`}
@@ -141,4 +148,4 @@ const MobileInput = () => {
   );
 };
 
-export default MobileInput;
+export default MobileLogin;

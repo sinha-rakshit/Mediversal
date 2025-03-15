@@ -2,8 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from "react-native";
 import Modal from "react-native-modal";
 import { styled } from "nativewind";
-import { theme } from "../assets/theme";
+import { theme } from "../../../config/theme";
 import ResetPasswordModal from "./ResetPasswordModal";
+import { IP_ADDR } from "@env";
 
 const StyledView = styled(View);
 const StyledText = styled(Text);
@@ -16,14 +17,14 @@ interface OTPModalProps {
   email: string;
 }
 
-const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, email }) => {
+const OtpForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, email }) => {
   const [userEmail, setUserEmail] = useState(email);
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [jwtToken, setJwtToken] = useState<string | null>(null);
   const inputRefs = useRef<(TextInput | null)[]>(Array(6).fill(null));
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(60);
   
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -64,7 +65,7 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
     setLoading(true);
 
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/verifyreset`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/verifyreset`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpCode }),
@@ -91,7 +92,7 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
     setTimer(30); // Reset timer
 
     try {
-      const response = await fetch(`http://13.201.98.12:4000/api/auth/forgotpassword`, {
+      const response = await fetch(`${IP_ADDR}/api/auth/forgotpassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: userEmail }), // ✅ Use Editable Email
@@ -114,8 +115,8 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
   return (
     <>
       <Modal isVisible={isVisible} style={{ margin: 0, justifyContent: "flex-end" }}
-      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250}>
-        <StyledView className="items-center p-8 bg-[#f8f8f8] rounded-t-3xl">
+      onBackButtonPress={onClose} onSwipeComplete={onClose} swipeDirection={["down"]} animationOut="slideOutDown" animationOutTiming={250} onBackdropPress={onClose}>
+        <StyledView className="items-center p-8 bg-[#f8f8f8] rounded-t-[40px]">
           <StyledView className="items-left">
             <StyledText className={`mb-3 text-2xl font-bold ${theme.colors.primary}`}>
               Verify to Reset Password
@@ -127,7 +128,7 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
             {/* ✅ Wrong Email? Change Email */}
           <StyledView className="self-start">
             <StyledTouchableOpacity onPress={onClose}>
-              <StyledText className="mb-3 text-base font-regular">
+              <StyledText className="mb-6 text-base font-regular">
                 <StyledText className={`${theme.colors.gray}`}>Wrong Email? </StyledText>
                 <StyledText className="text-[#0088B1]">Change Email</StyledText>
               </StyledText>
@@ -138,7 +139,7 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
 
           {/* ✅ Editable Email Input */}
           <StyledView
-            className={`self-start w-full p-2 mb-3 border border-gray-300 rounded-lg`}
+            className={`self-start w-full p-1 mb-3 border border-gray-300 rounded-lg pl-2`}
           >
             <StyledTextInput
               className={`text-base ${theme.colors.gray}`}
@@ -194,8 +195,8 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
             {loading ? (
               <ActivityIndicator color="[#f8f8f8]" />
             ) : (
-              <StyledText className={`text-lg font-bold ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
-                Verify OTP
+              <StyledText className={`text-base font-regular ${isOtpFilled ? "text-[#f8f8f8]" : "text-[#0088B1]"}`}>
+                Verify & Continue
               </StyledText>
             )}
           </StyledTouchableOpacity>
@@ -215,4 +216,4 @@ const ForgotPasswordModal: React.FC<OTPModalProps> = ({ isVisible, onClose, emai
   );
 };
 
-export default ForgotPasswordModal;
+export default OtpForgotPasswordModal;

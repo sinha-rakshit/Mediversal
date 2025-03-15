@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import CountryPicker, { Country } from "react-native-country-picker-modal";
 import { styled } from "nativewind";
-import { theme } from "../assets/theme";
+import { theme } from "../../config/theme";
 
 // ✅ Styled Components
 const StyledView = styled(View);
